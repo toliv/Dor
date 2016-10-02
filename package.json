@@ -1,0 +1,29 @@
+{
+  "name": "IoTHacks 2016 DUdes and John",
+  "version": "0.2.5",
+  "description": "Get a text when your friends are at the party! woo",
+  "engines": {
+    "node": "5.9.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ejs": "2.4.1",
+    "express": "4.13.3",
+    "body-parser": "~1.15.2",
+    "twilio": "~2.11.0",
+    "pg": "~6.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toliv/iothacks2016"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "license": "MIT"
+}

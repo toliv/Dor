@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="en" ng-app="StarterApp">
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+<body layout="column" ng-controller="AppCtrl as ctrl">
+  <md-toolbar layout="column"><span flex="flex"></span>
+    <div class="md-toolbar-tools">
+      <div layout="row" flex="flex" class="fill-height">
+        <div ng-hide="toggleSearch" class="md-toolbar-item md-breadcrumb"><span ng-click="toggleSearch = !toggleSearch">Party Guest List</span></div><span flex="flex" ng-hide="toggleSearch"></span>
+      </div>
+    </div>
+  </md-toolbar>
+  <md-content layout="row" layout-align="center stretch">
+    <form name="guestForm">
+      <md-input-container>
+        <label>Name</label>
+        <input ng-model="guest.name" required>
+      </md-input-container>
+
+      <md-input-container>
+        <label>Number</label>
+        <input ng-model="guest.number" required>
+      </md-input-container>
+
+      <md-input-container>
+        <label>Password</label>
+        <input ng-model="guest.password" required>
+      </md-input-container>
+      <md-button class="md-raised md-primary " ng-click="addGuest()">
+      Add Once
+      </md-button>
+      <md-button class="md-raised md-primary " ng-click="addPermanentGuest()">
+      Add Forever
+      </md-button>
+    </form>
+  </md-content>
+  <md-content layout="column" flex="flex">
+
+  <table md-colresize="md-colresize" class="md-table">
+    <thead>
+      <tr class="md-table-headers-row">
+        <th ng-repeat="h in headers" class="md-table-header">
+        <a href="#" ng-if="handleSort(h.field)" ng-click="reverse=!reverse;order(h.field,reverse)">
+        {{h.name}} 
+        <i ng-show="reverse && h.field == predicate" class="ion-android-arrow-dropup"></i>
+        <i ng-show="!reverse && h.field == predicate" class="ion-android-arrow-dropdown"></i>
+        </a>
+        <span ng-if="!handleSort(h.field)">
+        {{h.name}}
+        </span>
+        </th>
+        <th class="md-table-header">Save User</th>
+        <th class="md-table-header"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="c in content" class="md-table-content-row">
+        <td ng-repeat="h in headers" ng-class="customClass[h.field]" class="md-table-content">
+          {{c[h.field]}}
+        </td>
+        <td class="md-table-content">
+        <md-switch ng-model="c.permanent" ng-change="updateGuest(c)"></md-button>
+        </td>
+        <td class="md-table-content">
+        <md-button class="md-raised md-warn" ng-click="deleteGuest(c)">Delete</md-button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+    </md-content>
+</div>
+
+</body>
+</html>
