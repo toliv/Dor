@@ -8,7 +8,11 @@
   <md-toolbar layout="column"><span flex="flex"></span>
     <div class="md-toolbar-tools">
       <div layout="row" flex="flex" class="fill-height">
-        <div ng-hide="toggleSearch" class="md-toolbar-item md-breadcrumb"><span ng-click="toggleSearch = !toggleSearch">Party Guest List</span></div><span flex="flex" ng-hide="toggleSearch"></span>
+        <div class="md-toolbar-item md-breadcrumb">
+        <span>
+        Party Guest List
+        </span>
+        </div>
       </div>
     </div>
   </md-toolbar>
@@ -29,12 +33,12 @@
         <input ng-model="guest.password" required>
       </md-input-container>
       <md-button class="md-raised md-primary " ng-click="addGuest()">
-      Add Once
-      </md-button>
+      Add
+      </md-button><!-- 
       <md-button class="md-raised md-primary " ng-click="addPermanentGuest()">
       Add Forever
       </md-button>
-    </form>
+ -->    </form>
   </md-content>
   <md-content layout="column" flex="flex">
 
@@ -42,12 +46,7 @@
     <thead>
       <tr class="md-table-headers-row">
         <th ng-repeat="h in headers" class="md-table-header">
-        <a href="#" ng-if="handleSort(h.field)" ng-click="reverse=!reverse;order(h.field,reverse)">
-        {{h.name}} 
-        <i ng-show="reverse && h.field == predicate" class="ion-android-arrow-dropup"></i>
-        <i ng-show="!reverse && h.field == predicate" class="ion-android-arrow-dropdown"></i>
-        </a>
-        <span ng-if="!handleSort(h.field)">
+        <span>
         {{h.name}}
         </span>
         </th>
