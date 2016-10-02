@@ -1,12 +1,6 @@
 #include <DebouncedButton.h>
-/*
- *  Simple HTTP get webclient test
- */
-
 #include <ESP8266WiFi.h>
-//#include <Constants.h>
 #define BUTTON_TEST
-//#define HTTP_TEST
 
 const char* ssid     = "CalVisitor";
 const char* password = "yourpassword";
@@ -14,20 +8,26 @@ const int buttonPin = 12;
 
 DebouncedButton* button1;
 DebouncedButton* button2;
+DebouncedButton* button3;
 DebouncedButton* enterButton;
-// DebouncedButton* button3;
-// DebouncedButton* button4;
 
-const char* host = "wifitest.adafruit.com";
+
+bool enterButtonPressed = 0;
+int sequence = 0;
+int timeout = 5000;
+int lastKeyPress = 0;
+
+const char* host = "https://glacial-basin-21655.herokuapp.com";
 
 void setup() {
   Serial.begin(115200);
 
   delay(100);
 
-  button1 = new DebouncedButton(12, 50);
-  button2 = new DebouncedButton(14, 50);
-  enterButton = new DebouncedButton(5, 50);
+  button1 = new DebouncedButton(14, 50);
+  button2 = new DebouncedButton(12, 50);
+  button3 = new DebouncedButton(5, 50);
+  enterButton = new DebouncedButton(4, 50);
 
 
   // We start by connecting to a WiFi network
@@ -54,33 +54,41 @@ void setup() {
 int value = 0;
 
 void loop() {
-  int code = waitForKeyCode();
-  if(code != 0){
-    String s = String(code);
-    Serial.print("This is the code");
-    Serial.println(code);
+  if(millis() - lastKeyPress > timeout){
+    lastKeyPress = millis();
+    sequence = 0;
   }
-  delay(100);
-  // if(button1->isPressed()){
-  //   Serial.println("Button 1 pressed");
-  // }
-  // else if(button2->isPressed()){
-  //   Serial.println("Button 2 pressed");
-  // }
-  // else if(enterButton->isPressed()){
-  //   Serial.println("Enter button pressed");
-  // }
-  // String s = String(code);
-  // Serial.print("This is the code:");
-  //Serial.println(s);
+  if(enterButtonPressed){
+    if(sequence != 0){
+      String s = String(sequence);
+      Serial.println(s);
+      bool res = isValidKeyCode(s);
+      sequence = 0;
+      enterButtonPressed = 0;
+    }
+  }
+  if(button1->isPressed()){
+    Serial.println("Button 1 pressed");
+    sequence = sequence*10 + 1;
+    lastKeyPress = millis();
+  }
+  else if(button2->isPressed()){
+    Serial.println("Button 2 pressed");
+    sequence = sequence *10 + 2;
+    lastKeyPress = millis();
+  }
+  else if(button3->isPressed()){
+    Serial.println("Button 3 pressed");
+    sequence = sequence * 10 + 3;
+  }
+  else if(enterButton->isPressed()){
+    Serial.println("Enter button pressed");
+    enterButtonPressed = 1;
+  }
+  delay(30);
+}
 
-
-
-  // Serial.printf("Value is %i\n", value);
-
-  #ifdef HTTP_TEST
-  ++value;
-
+bool isValidKeyCode(String code){
   Serial.print("connecting to ");
   Serial.println(host);
   
@@ -89,52 +97,40 @@ void loop() {
   const int httpPort = 80;
   if (!client.connect(host, httpPort)) {
     Serial.println("connection failed");
-    return;
+    return 0;
   }
   
   // We now create a URI for the request
-  String url = "/testwifi/index.html";
+  String url = "/api/v1/verify";
   Serial.print("Requesting URL: ");
   Serial.println(url);
-  
-  // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" + 
-               "Connection: close\r\n\r\n");
+
+  client.println("POST /api/v1/verify HTTP/1.1");
+  client.println("Host: glacial-basin-21655.herokuapp.com");
+  client.println("Cache-Control: no-cache");
+  client.println("Connection: close");
+  client.println("Content-Type: application/json");
+  client.print("Content-Length: ");
+  String json = String("{\"pass\":\""+code+ "\"}");
+  client.println(json.length());
+  client.println();
+  Serial.println(json);
+  client.print(json);
+
   delay(500);
   
+  Serial.println("Sent POST request");
+
   // Read all the lines of the reply from server and print them to Serial
   while(client.available()){
     String line = client.readStringUntil('\r');
-    Serial.print(line);
+    if (line.startsWith("200 OK", 9)) {
+      Serial.println("Got an OK from the server"); 
+    }
   }
   
   Serial.println();
   Serial.println("closing connection");
-  #endif
+  return 1;
 }
 
-int waitForKeyCode(){
-  long timeout = 3000;
-  long initTime = millis();
-  Serial.println(initTime);
-  int passkey = 0;
-  bool enterPressed = 0;
-  while(((millis() - initTime) < timeout) || (!enterPressed)){
-      if(button1->isPressed()){
-        Serial.println("Button 1 pressed.");
-        initTime = millis();
-        passkey = (passkey*10) + 1;
-      }
-      else if(button2->isPressed()){
-        Serial.println("Button 2 pressed");
-        initTime= millis();
-        passkey = passkey*10 + 2;
-      }
-      else if(enterButton->isPressed()){
-        Serial.println("Enter button pressed");
-        enterPressed = 1;
-      }
-    }
-    return passkey;
-}
