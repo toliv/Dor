@@ -1,6 +1,7 @@
 #include <DebouncedButton.h>
 #include <ESP8266WiFi.h>
 #define BUTTON_TEST
+#include <SPI.h>
 
 const char* ssid     = "CalVisitor";
 const char* password = "yourpassword";
@@ -10,6 +11,9 @@ DebouncedButton* button1;
 DebouncedButton* button2;
 DebouncedButton* button3;
 DebouncedButton* enterButton;
+int redPin = 0;
+int greenPin = 16;
+int bluePin = 2;
 
 
 bool enterButtonPressed = 0;
@@ -17,12 +21,17 @@ int sequence = 0;
 int timeout = 5000;
 int lastKeyPress = 0;
 
+
 const char* host = "https://glacial-basin-21655.herokuapp.com";
 
 void setup() {
   Serial.begin(115200);
 
   delay(100);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);  
+ 
 
   button1 = new DebouncedButton(14, 50);
   button2 = new DebouncedButton(12, 50);
@@ -54,6 +63,7 @@ void setup() {
 int value = 0;
 
 void loop() {
+  setColor(255, 0, 255);  // purple
   if(millis() - lastKeyPress > timeout){
     lastKeyPress = millis();
     sequence = 0;
@@ -125,12 +135,33 @@ bool isValidKeyCode(String code){
   while(client.available()){
     String line = client.readStringUntil('\r');
     if (line.startsWith("200 OK", 9)) {
-      Serial.println("Got an OK from the server"); 
+      Serial.println("Got an OK from the server");
+      setColor(0, 255, 0);  // green
+      delay(5000);
+      break;
+    }
+    else {
+      //bad response
+      setColor(255, 0, 0);  // red
+      delay(5000);
+      break;
     }
   }
   
   Serial.println();
   Serial.println("closing connection");
   return 1;
+}
+
+void setColor(int red, int green, int blue)
+{
+  #ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+  #endif
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);  
 }
 
