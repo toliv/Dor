@@ -27,7 +27,7 @@ i {
 }
 
 .md-table tbody tr:hover, .md-table tbody tr:focus {
-  cursor:pointer;
+  /*cursor:pointer;*/
   background-color:rgba(63,81,181,0.2);
 }
 

@@ -40,6 +40,7 @@ app.get('/api/v1/guests', function(req, resp){
 	pg.connect(process.env.DATABASE_URL, function(err, pgclient, done) {
 		pgclient.query("SELECT * FROM guests;",
 			function(err, result) {
+				done();
 				if(err){
 					resp.status(400).json({'err': err.detail});
 					console.error(err);
@@ -56,6 +57,7 @@ app.delete('/api/v1/guests', function(req, resp){
 	pg.connect(process.env.DATABASE_URL, function(err, pgclient, done) {
 		pgclient.query("DELETE FROM guests WHERE id = $1;", [req.query.id],
 			function(err, result) {
+				done();
 				if(err){
 					resp.status(400).json({'err': err.detail});
 					console.error(err);
@@ -72,6 +74,7 @@ app.put('/api/v1/guests', function(req, resp){
 	pg.connect(process.env.DATABASE_URL, function(err, pgclient, done) {
 		pgclient.query("UPDATE guests SET permanent = $2 WHERE id = $1;", [req.body.id, req.body.permanent],
 			function(err, result) {
+				done();
 				if(err){
 					resp.status(400).json({'err': err.detail});
 					console.error(err);
@@ -89,6 +92,7 @@ app.post('/api/v1/guests', function(req, resp){
 		pgclient.query("INSERT INTO guests(name, number, password) VALUES ($1, $2, $3);",
 			[req.body.name, req.body.number, req.body.password],
 			function(err, result) {
+				done();
 				if(err){
 					resp.status(500).json(err);
 					console.error(err);
